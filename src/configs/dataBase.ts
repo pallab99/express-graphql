@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-export const connectDB = async () => {
+const connectDB = async (): Promise<void> => {
   try {
     const dbConnectionString = process.env.DB_CONNECTION_STRING;
     if (dbConnectionString) {
@@ -15,3 +15,4 @@ export const connectDB = async () => {
     console.log(error);
   }
 };
+export default connectDB;

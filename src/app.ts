@@ -1,19 +1,12 @@
-import { ApolloServer } from 'apollo-server-express';
-import { typeDefs } from './typeDefs';
-import { resolvers } from './resolvers';
+import express, { Application } from 'express';
+const app: Application = express();
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 
-export async function startServer(app: any, port: string) {
-  const apolloServer = new ApolloServer({
-    typeDefs: typeDefs,
-    resolvers: resolvers,
-    context: ({ req, res }) => ({ req, res }),
-  });
+app.use(cors({ origin: true, credentials: true }));
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-  await apolloServer.start();
-
-  apolloServer.applyMiddleware({ app: app });
-
-  app.listen(port, () => {
-    console.log('Server Started at port ' + port);
-  });
-}
+export default app;

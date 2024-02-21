@@ -1,17 +1,25 @@
-import express, { Application } from 'express';
-import { startServer } from './app';
-const app: Application = express();
-import cors from 'cors';
-import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
-import { connectDB } from './configs/dataBase';
+import { ApolloServer } from 'apollo-server-express';
+import { typeDefs } from './typeDefs';
+import { resolvers } from './resolvers';
+import connectDB from './configs/dataBase';
+import app from './app';
 require('dotenv').config();
 const port = process.env.PORT as string;
 
-app.use(cors({ origin: true, credentials: true }));
-app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
+const startServer = async (): Promise<void> => {
+  const apolloServer = new ApolloServer({
+    typeDefs: typeDefs,
+    resolvers: resolvers,
+    context: ({ req, res }) => ({ req, res }),
+  });
 
-connectDB();
-startServer(app, port);
+  await apolloServer.start();
+
+  apolloServer.applyMiddleware({ app: app as any });
+
+  app.listen(port, () => {
+    console.log('Server Started at port ' + port);
+  });
+};
+
+connectDB().then(startServer);
